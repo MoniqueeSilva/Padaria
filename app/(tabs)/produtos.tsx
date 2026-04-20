@@ -12,8 +12,10 @@ import {
   useColorScheme,
 } from 'react-native';
 
+import { IProduto } from '../../interfaces/iProduto';
+
 export default function Produtos() {
-  const [produtos, setProdutos] = useState<any[]>([]); //lista de qualquer coisa(tipo)
+  const [produtos, setProdutos] = useState<IProduto[]>([]);
   const [modal, setModal] = useState(false);
 
   const [nome, setNome] = useState('');
@@ -28,10 +30,10 @@ export default function Produtos() {
       return;
     }
 
-    const novo = {
-      id: Date.now().toString(), //id único usando data atual
+    const novo: IProduto = {
+      id: Date.now().toString(),
       nome,
-      preco,
+      preco: Number(preco),
       descricao,
     };
 
@@ -46,33 +48,38 @@ export default function Produtos() {
   return (
     <ThemedView style={styles.container}>
       <ThemedText style={styles.titulo}>Lista de Produtos</ThemedText>
+
       <FlatList
         data={produtos}
         keyExtractor={(item) => item.id}
         ListEmptyComponent={
-          <ThemedText style={styles.vazio}>Nenhum produto cadastrado</ThemedText>
+          <ThemedText style={styles.vazio}>
+            Nenhum produto cadastrado
+          </ThemedText>
         }
-
         renderItem={({ item }) => (
           <ThemedView style={styles.card}>
             <ThemedText style={styles.nome}>{item.nome}</ThemedText>
-            <ThemedText style={styles.preco}>R$ {item.preco}</ThemedText>
-            <ThemedText style={styles.descricao}>{item.descricao}</ThemedText>
+            <ThemedText style={styles.preco}>
+              R$ {item.preco.toFixed(2)}
+            </ThemedText>
+            <ThemedText style={styles.descricao}>
+              {item.descricao}
+            </ThemedText>
           </ThemedView>
         )}
       />
 
-      <TouchableOpacity
-        style={styles.botao}
-        onPress={() => setModal(true)}
-      >
-        <ThemedText style={styles.textoBotao}>Adicionar Produto</ThemedText>
+      <TouchableOpacity style={styles.botao} onPress={() => setModal(true)}>
+        <ThemedText style={styles.textoBotao}>
+          Adicionar Produto
+        </ThemedText>
       </TouchableOpacity>
 
       <Modal visible={modal} animationType="slide">
         <ThemedView style={styles.modal}>
           <ThemedText style={styles.titulo}>Novo Produto</ThemedText>
-          
+
           <TextInput
             placeholder="Nome"
             value={nome}
@@ -91,6 +98,7 @@ export default function Produtos() {
             placeholder="Preço"
             value={preco}
             onChangeText={setPreco}
+            keyboardType="numeric"
             placeholderTextColor={tema === 'dark' ? '#aaa' : '#555'}
             style={[
               styles.input,
@@ -119,10 +127,8 @@ export default function Produtos() {
             <Button title="Salvar" onPress={adicionar} />
             <Button title="Cancelar" onPress={() => setModal(false)} />
           </View>
-
         </ThemedView>
       </Modal>
-
     </ThemedView>
   );
 }
