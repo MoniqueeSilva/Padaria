@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  Button,
   View,
   useColorScheme,
 } from 'react-native';
@@ -21,27 +20,59 @@ export default function Produtos() {
   const [nome, setNome] = useState('');
   const [preco, setPreco] = useState('');
   const [descricao, setDescricao] = useState('');
+  const [editandoId, setEditandoId] = useState<string | null>(null);
 
   const tema = useColorScheme();
 
-  function adicionar() {
+  // CREATE + UPDATE
+  function salvar() {
     if (nome === '' || preco === '') {
       alert('Preencha nome e preço');
       return;
     }
 
-    const novo: IProduto = {
-      id: Date.now().toString(),
-      nome,
-      preco: Number(preco),
-      descricao,
-    };
+    if (editandoId) {
+      setProdutos(produtos.map(p =>
+        p.id === editandoId
+          ? { ...p, nome, preco: Number(preco), descricao }
+          : p
+      ));
+    } else {
+      const novo: IProduto = {
+        id: Date.now().toString(),
+        nome,
+        preco: Number(preco),
+        descricao,
+      };
 
-    setProdutos([...produtos, novo]);
+      setProdutos([...produtos, novo]);
+    }
 
+    limpar();
+  }
+
+  // EDITAR (clicando no item)
+  function editar(produto: IProduto) {
+    setNome(produto.nome);
+    setPreco(produto.preco.toString());
+    setDescricao(produto.descricao);
+
+    setEditandoId(produto.id);
+    setModal(true);
+  }
+
+  // DELETE
+  function deletar(id: string) {
+    setProdutos(produtos.filter(p => p.id !== id));
+    limpar();
+  }
+
+  // RESET
+  function limpar() {
     setNome('');
     setPreco('');
     setDescricao('');
+    setEditandoId(null);
     setModal(false);
   }
 
@@ -58,19 +89,24 @@ export default function Produtos() {
           </ThemedText>
         }
         renderItem={({ item }) => (
-          <ThemedView style={styles.card}>
-            <ThemedText style={styles.nome}>{item.nome}</ThemedText>
-            <ThemedText style={styles.preco}>
-              R$ {item.preco.toFixed(2)}
-            </ThemedText>
-            <ThemedText style={styles.descricao}>
-              {item.descricao}
-            </ThemedText>
-          </ThemedView>
+          <TouchableOpacity onPress={() => editar(item)} activeOpacity={0.7}>
+            <ThemedView style={styles.card}>
+              <ThemedText style={styles.nome}>{item.nome}</ThemedText>
+              <ThemedText style={styles.preco}>
+                R$ {item.preco.toFixed(2)}
+              </ThemedText>
+              <ThemedText style={styles.descricao}>
+                {item.descricao}
+              </ThemedText>
+            </ThemedView>
+          </TouchableOpacity>
         )}
       />
 
-      <TouchableOpacity style={styles.botao} onPress={() => setModal(true)}>
+      <TouchableOpacity
+        style={styles.botao}
+        onPress={() => setModal(true)}
+      >
         <ThemedText style={styles.textoBotao}>
           Adicionar Produto
         </ThemedText>
@@ -78,7 +114,9 @@ export default function Produtos() {
 
       <Modal visible={modal} animationType="slide">
         <ThemedView style={styles.modal}>
-          <ThemedText style={styles.titulo}>Novo Produto</ThemedText>
+          <ThemedText style={styles.titulo}>
+            {editandoId ? 'Editar Produto' : 'Novo Produto'}
+          </ThemedText>
 
           <TextInput
             placeholder="Nome"
@@ -124,8 +162,33 @@ export default function Produtos() {
           />
 
           <View style={{ marginTop: 10 }}>
-            <Button title="Salvar" onPress={adicionar} />
-            <Button title="Cancelar" onPress={() => setModal(false)} />
+            <TouchableOpacity
+              style={styles.botaoSalvar}
+              onPress={salvar}
+              activeOpacity={0.7}
+            >
+              <ThemedText style={styles.textoBotao}>
+                {editandoId ? 'Editar' : 'Salvar'}
+              </ThemedText>
+            </TouchableOpacity>
+
+            {editandoId && (
+              <TouchableOpacity
+                style={styles.botaoDeletar}
+                onPress={() => deletar(editandoId)}
+                activeOpacity={0.7}
+              >
+                <ThemedText style={styles.textoBotao}>Deletar</ThemedText>
+              </TouchableOpacity>
+            )}
+
+            <TouchableOpacity
+              style={styles.botaoCancelar}
+              onPress={limpar}
+              activeOpacity={0.7}
+            >
+              <ThemedText style={styles.textoBotao}>Cancelar</ThemedText>
+            </TouchableOpacity>
           </View>
         </ThemedView>
       </Modal>

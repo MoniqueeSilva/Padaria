@@ -15,14 +15,16 @@ export const styles = StyleSheet.create({
   vazio: {
     marginTop: 10,
     opacity: 0.6,
+    textAlign: 'center',
   },
 
   card: {
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     marginTop: 10,
     borderWidth: 1,
     borderColor: '#ccc',
+    backgroundColor: '#1c1c1c', // melhor no dark
   },
 
   nome: {
@@ -40,9 +42,9 @@ export const styles = StyleSheet.create({
   },
 
   botao: {
-    backgroundColor: '#75ea3f',
-    padding: 12,
-    borderRadius: 8,
+    backgroundColor: '#bc9425',
+    padding: 14,
+    borderRadius: 10,
     marginTop: 20,
     alignItems: 'center',
   },
@@ -50,6 +52,7 @@ export const styles = StyleSheet.create({
   textoBotao: {
     color: '#fff',
     fontWeight: 'bold',
+    textAlign: 'center',
   },
 
   modal: {
@@ -60,8 +63,37 @@ export const styles = StyleSheet.create({
 
   input: {
     borderWidth: 1,
-    padding: 10,
+    padding: 12,
     marginTop: 10,
-    borderRadius: 6,
+    borderRadius: 8,
+  },
+
+  // 🔥 BOTÕES DO MODAL
+  botaoSalvar: {
+    backgroundColor: '#4CAF50',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 10,
+  },
+
+  botaoEditar: {
+    backgroundColor: '#2196F3',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 10,
+  },
+
+  botaoDeletar: {
+    backgroundColor: '#f44336',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 10,
+  },
+
+  botaoCancelar: {
+    backgroundColor: '#555',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 10,
   },
 });
