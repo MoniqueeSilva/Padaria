@@ -59,31 +59,37 @@ export default function Pedidos() {
   // GPS
   async function pegarLocalizacao() {
 
-    try {
+  try {
 
-      const { status } =
-        await Location.requestForegroundPermissionsAsync();
+    const permissao =
+      await Location.requestForegroundPermissionsAsync();
 
-      if (status !== 'granted') {
-        alert('Permissão de localização negada');
-        return;
-      }
-
-      const localizacao =
-        await Location.getCurrentPositionAsync({});
-
-      setLatitude(
-        localizacao.coords.latitude.toString()
-      );
-
-      setLongitude(
-        localizacao.coords.longitude.toString()
-      );
-
-    } catch (error) {
-      console.log(error);
+    if (permissao.status !== 'granted') {
+      alert('Permissão negada');
+      return;
     }
+
+    const localizacao =
+      await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+    setLatitude(
+      localizacao.coords.latitude.toString()
+    );
+
+    setLongitude(
+      localizacao.coords.longitude.toString()
+    );
+
+    console.log(localizacao);
+
+  } catch (error) {
+
+    console.log('ERRO GPS:', error);
+
   }
+}
 
   // SALVAR / EDITAR
   async function salvar() {
