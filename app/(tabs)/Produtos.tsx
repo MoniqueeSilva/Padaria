@@ -5,13 +5,11 @@ import { styles } from '../styles/produtos';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { useRouter } from 'expo-router';
+
 import {
   FlatList,
   TouchableOpacity,
-  Modal,
-  TextInput,
-  View,
-  useColorScheme,
 } from 'react-native';
 
 import { IProduto } from '../../interfaces/iProduto';
@@ -19,14 +17,8 @@ import { IProduto } from '../../interfaces/iProduto';
 export default function Produtos() {
 
   const [produtos, setProdutos] = useState<IProduto[]>([]);
-  const [modal, setModal] = useState(false);
 
-  const [nome, setNome] = useState('');
-  const [preco, setPreco] = useState('');
-  const [descricao, setDescricao] = useState('');
-  const [editandoId, setEditandoId] = useState<string | null>(null);
-
-  const tema = useColorScheme();
+  const router = useRouter();
 
   useEffect(() => {
     carregarProdutos();
@@ -34,6 +26,7 @@ export default function Produtos() {
 
   // CARREGAR PRODUTOS
   async function carregarProdutos() {
+
     try {
 
       const dados = await AsyncStorage.getItem('@produtos');
@@ -45,76 +38,6 @@ export default function Produtos() {
     } catch (error) {
       console.log(error);
     }
-  }
-
-  // SALVAR / EDITAR
-  async function salvar() {
-
-    if (nome === '' || preco === '') {
-      alert('Preencha nome e preço');
-      return;
-    }
-
-    try {
-
-      // EDITAR
-      if (editandoId) {
-
-        const listaAtualizada = produtos.map((p) =>
-          p.id === editandoId
-            ? {
-                ...p,
-                nome,
-                preco: Number(preco),
-                descricao,
-              }
-            : p
-        );
-
-        setProdutos(listaAtualizada);
-
-        await AsyncStorage.setItem(
-          '@produtos',
-          JSON.stringify(listaAtualizada)
-        );
-
-      } else {
-
-        // NOVO PRODUTO
-        const novo: IProduto = {
-          id: Date.now().toString(),
-          nome,
-          preco: Number(preco),
-          descricao,
-        };
-
-        const novaLista = [...produtos, novo];
-
-        setProdutos(novaLista);
-
-        await AsyncStorage.setItem(
-          '@produtos',
-          JSON.stringify(novaLista)
-        );
-      }
-
-      limpar();
-
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  // EDITAR
-  function editar(produto: IProduto) {
-
-    setNome(produto.nome);
-    setPreco(produto.preco.toString());
-    setDescricao(produto.descricao);
-
-    setEditandoId(produto.id);
-
-    setModal(true);
   }
 
   // DELETAR
@@ -133,23 +56,9 @@ export default function Produtos() {
         JSON.stringify(novaLista)
       );
 
-      limpar();
-
     } catch (error) {
       console.log(error);
     }
-  }
-
-  // LIMPAR
-  function limpar() {
-
-    setNome('');
-    setPreco('');
-    setDescricao('');
-
-    setEditandoId(null);
-
-    setModal(false);
   }
 
   return (
@@ -163,6 +72,7 @@ export default function Produtos() {
       <FlatList
         data={produtos}
         keyExtractor={(item) => item.id}
+
         ListEmptyComponent={
           <ThemedText style={styles.vazio}>
             Nenhum produto cadastrado
@@ -171,12 +81,11 @@ export default function Produtos() {
 
         renderItem={({ item }) => (
 
-          <TouchableOpacity
-            onPress={() => editar(item)}
-            activeOpacity={0.7}
-          >
+          <ThemedView style={styles.card}>
 
-            <ThemedView style={styles.card}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+            >
 
               <ThemedText style={styles.nome}>
                 {item.nome}
@@ -190,15 +99,26 @@ export default function Produtos() {
                 {item.descricao}
               </ThemedText>
 
-            </ThemedView>
+            </TouchableOpacity>
 
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.botaoDeletar}
+              onPress={() => deletar(item.id)}
+            >
+
+              <ThemedText style={styles.textoBotao}>
+                Deletar
+              </ThemedText>
+
+            </TouchableOpacity>
+
+          </ThemedView>
         )}
       />
 
       <TouchableOpacity
         style={styles.botao}
-        onPress={() => setModal(true)}
+        onPress={() => router.push('/ProdutoCreate')}
       >
 
         <ThemedText style={styles.textoBotao}>
@@ -206,146 +126,6 @@ export default function Produtos() {
         </ThemedText>
 
       </TouchableOpacity>
-
-      <Modal visible={modal} animationType="slide">
-
-        <ThemedView style={styles.modal}>
-
-          <ThemedText style={styles.titulo}>
-            {editandoId
-              ? 'Editar Produto'
-              : 'Novo Produto'}
-          </ThemedText>
-
-          <TextInput
-            placeholder="Nome"
-            value={nome}
-            onChangeText={setNome}
-            placeholderTextColor={
-              tema === 'dark'
-                ? '#aaa'
-                : '#555'
-            }
-
-            style={[
-              styles.input,
-              {
-                color:
-                  tema === 'dark'
-                    ? '#fff'
-                    : '#000',
-
-                borderColor:
-                  tema === 'dark'
-                    ? '#555'
-                    : '#ccc',
-              },
-            ]}
-          />
-
-          <TextInput
-            placeholder="Preço"
-            value={preco}
-            onChangeText={setPreco}
-            keyboardType="numeric"
-
-            placeholderTextColor={
-              tema === 'dark'
-                ? '#aaa'
-                : '#555'
-            }
-
-            style={[
-              styles.input,
-              {
-                color:
-                  tema === 'dark'
-                    ? '#fff'
-                    : '#000',
-
-                borderColor:
-                  tema === 'dark'
-                    ? '#555'
-                    : '#ccc',
-              },
-            ]}
-          />
-
-          <TextInput
-            placeholder="Descrição"
-            value={descricao}
-            onChangeText={setDescricao}
-
-            placeholderTextColor={
-              tema === 'dark'
-                ? '#aaa'
-                : '#555'
-            }
-
-            style={[
-              styles.input,
-              {
-                color:
-                  tema === 'dark'
-                    ? '#fff'
-                    : '#000',
-
-                borderColor:
-                  tema === 'dark'
-                    ? '#555'
-                    : '#ccc',
-              },
-            ]}
-          />
-
-          <View style={{ marginTop: 10 }}>
-
-            <TouchableOpacity
-              style={styles.botaoSalvar}
-              onPress={salvar}
-              activeOpacity={0.7}
-            >
-
-              <ThemedText style={styles.textoBotao}>
-                {editandoId
-                  ? 'Editar'
-                  : 'Salvar'}
-              </ThemedText>
-
-            </TouchableOpacity>
-
-            {editandoId && (
-
-              <TouchableOpacity
-                style={styles.botaoDeletar}
-                onPress={() => deletar(editandoId)}
-                activeOpacity={0.7}
-              >
-
-                <ThemedText style={styles.textoBotao}>
-                  Deletar
-                </ThemedText>
-
-              </TouchableOpacity>
-            )}
-
-            <TouchableOpacity
-              style={styles.botaoCancelar}
-              onPress={limpar}
-              activeOpacity={0.7}
-            >
-
-              <ThemedText style={styles.textoBotao}>
-                Cancelar
-              </ThemedText>
-
-            </TouchableOpacity>
-
-          </View>
-
-        </ThemedView>
-
-      </Modal>
 
     </ThemedView>
   );

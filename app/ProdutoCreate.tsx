@@ -1,38 +1,51 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, useColorScheme } from 'react-native';
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  useColorScheme,
+} from 'react-native';
 
-import { ThemedView } from '../../components/themed-view';
-import { ThemedText } from '../../components/themed-text';
-import { styles } from '../styles/pedido';
+import { useRouter } from 'expo-router';
 
-export default function CreatePedido() {
-  const [data, setData] = useState('');
-  const [valorTotal, setValorTotal] = useState('');
+import { ThemedView } from '../components/themed-view';
+import { ThemedText } from '../components/themed-text';
+import { styles } from './styles/produtos';
+
+export default function ProdutoCreate() {
+  const router = useRouter();
+
+  const [nome, setNome] = useState('');
+  const [preco, setPreco] = useState('');
 
   const tema = useColorScheme();
 
   function salvar() {
-    if (data === '' || valorTotal === '') {
-      alert('Preencha data e valor total');
+    if (nome === '' || preco === '') {
+      alert('Preencha nome e preço');
       return;
     }
 
     console.log({
-      data,
-      valorTotal: Number(valorTotal),
+      nome,
+      preco: Number(preco),
     });
+
+    alert('Produto salvo!');
+
+    router.back();
   }
 
   return (
     <ThemedView style={styles.modal}>
       <ThemedText style={styles.titulo}>
-        Novo Pedido
+        Novo Produto
       </ThemedText>
 
       <TextInput
-        placeholder="Data (ex: 22/04/2026)"
-        value={data}
-        onChangeText={setData}
+        placeholder="Nome do Produto"
+        value={nome}
+        onChangeText={setNome}
         placeholderTextColor={tema === 'dark' ? '#aaa' : '#555'}
         style={[
           styles.input,
@@ -44,9 +57,9 @@ export default function CreatePedido() {
       />
 
       <TextInput
-        placeholder="Valor Total"
-        value={valorTotal}
-        onChangeText={setValorTotal}
+        placeholder="Preço"
+        value={preco}
+        onChangeText={setPreco}
         keyboardType="numeric"
         placeholderTextColor={tema === 'dark' ? '#aaa' : '#555'}
         style={[
@@ -70,6 +83,7 @@ export default function CreatePedido() {
 
         <TouchableOpacity
           style={styles.botaoCancelar}
+          onPress={() => router.back()}
         >
           <ThemedText style={styles.textoBotao}>
             Cancelar

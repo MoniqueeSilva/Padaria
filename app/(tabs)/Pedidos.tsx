@@ -1,14 +1,10 @@
-import React, { useState, useEffect } from 'react';
-
+import React, { useState, useEffect} from 'react';
+import { useRouter } from 'expo-router';
 import { ThemedView } from '../../components/themed-view';
 import { ThemedText } from '../../components/themed-text';
-
 import { styles } from '../styles/pedido';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import * as Location from 'expo-location';
-
 import {
   FlatList,
   TouchableOpacity,
@@ -24,10 +20,10 @@ export default function Pedidos() {
 
   const [pedidos, setPedidos] = useState<IPedido[]>([]);
   const [modal, setModal] = useState(false);
-
   const [data, setData] = useState('');
   const [valorTotal, setValorTotal] = useState('');
   const [editandoId, setEditandoId] = useState<string | null>(null);
+  const router = useRouter();
 
   // GPS
   const [latitude, setLatitude] = useState('');
@@ -257,7 +253,7 @@ export default function Pedidos() {
 
       <TouchableOpacity
         style={styles.botao}
-        onPress={() => setModal(true)}
+        onPress={() => router.push('/PedidoCreate')}
       >
 
         <ThemedText style={styles.textoBotao}>

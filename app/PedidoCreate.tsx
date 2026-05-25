@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, useColorScheme } from 'react-native';
 import { useRouter } from 'expo-router';
-
-import { ThemedView } from '../../components/themed-view';
-import { ThemedText } from '../../components/themed-text';
-import { styles } from '../styles/pedido';
+import { ThemedView } from '../components/themed-view';
+import { ThemedText } from '../components/themed-text';
+import { styles } from './styles/pedido';
 
 export default function CreatePedido() {
   const router = useRouter();
-
+  
   const [data, setData] = useState('');
   const [valorTotal, setValorTotal] = useState('');
 
@@ -25,7 +24,8 @@ export default function CreatePedido() {
       valorTotal: Number(valorTotal),
     });
 
-    router.back(); // fecha a tela (modal)
+    alert('Pedido salvo!');
+    router.back();
   }
 
   return (
@@ -75,7 +75,6 @@ export default function CreatePedido() {
 
         <TouchableOpacity
           style={styles.botaoCancelar}
-          onPress={() => router.back()}
         >
           <ThemedText style={styles.textoBotao}>
             Cancelar
